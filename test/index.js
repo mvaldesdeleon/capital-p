@@ -6,6 +6,8 @@ const res = x => P((res, rej) => res(x));
 const rej = x => P((res, rej) => rej(x));
 
 test('P', t => {
+    const error = new Error('error');
+
     const never = sinon.spy();
     const pt = sinon.spy();
     const qt = sinon.spy();
@@ -14,6 +16,9 @@ test('P', t => {
     const uc = sinon.spy();
     const vt = sinon.spy();
     const wt = sinon.spy();
+    const xc = sinon.spy();
+    const yc = sinon.spy();
+    const zt = sinon.spy();
 
     const p = res(3);
     const q = p.then(x => x + 3); // 6
@@ -22,6 +27,11 @@ test('P', t => {
     const u = s.then(never);
     const v = u.catch(x => x); // 9
     const w = v.then(x => x * 2); // 18
+    const x = w.then(x => {
+        throw error;
+    });
+    const y = x.then(never);
+    const z = y.catch(x => 'fixed');
 
     p.catch(never);
     q.catch(never);
@@ -30,6 +40,9 @@ test('P', t => {
     u.catch(uc);
     v.catch(never);
     w.catch(never);
+    x.catch(xc);
+    y.catch(yc);
+    z.catch(never);
 
     p.then(pt);
     q.then(qt);
@@ -38,6 +51,9 @@ test('P', t => {
     u.then(never);
     v.then(vt);
     w.then(wt);
+    x.then(never);
+    y.then(never);
+    z.then(zt);
 
     t.true(never.notCalled);
     t.true(pt.called);
@@ -54,6 +70,12 @@ test('P', t => {
     t.true(vt.calledWith(9));
     t.true(wt.called);
     t.true(wt.calledWith(18));
+    t.true(xc.called);
+    t.true(xc.calledWith(error));
+    t.true(yc.called);
+    t.true(yc.calledWith(error));
+    t.true(zt.called);
+    t.true(zt.calledWith('fixed'));
 
     t.end();
 });
