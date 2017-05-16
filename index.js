@@ -10,10 +10,12 @@ const P = fn => {
     let s = 'pen', v;
 
     fn((...args) => {
+        if (s !== 'pen') return;
         ress.map(([res, rej, t]) => _tc(res, rej, t)(...args));
         v = args;
         s = 'res';
     },(...args) => {
+        if (s !== 'pen') return;
         rejs.map(([res, rej, c]) => _tc(res, rej, c)(...args));
         v = args;
         s = 'rej';
