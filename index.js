@@ -11,12 +11,12 @@ const P = fn => {
 
     fn((...args) => {
         if (s !== 'pen') return;
-        ress.map(([res, rej, t]) => _tc(res, rej, t)(...args));
+        ress.map(([res, rej, t]) => _f(t) ? _tc(res, rej, t)(...args) : res(...args));
         v = args;
         s = 'res';
     },(...args) => {
         if (s !== 'pen') return;
-        rejs.map(([res, rej, c]) => _tc(res, rej, c)(...args));
+        rejs.map(([res, rej, c]) => _f(c) ? _tc(res, rej, c)(...args) : rej(...args));
         v = args;
         s = 'rej';
     });
@@ -25,8 +25,8 @@ const P = fn => {
         if (s === 'res') return _f(t) ? _tc(res, rej, t)(...v) : res(...v);
         else if (s === 'rej') return _f(c) ? _tc(res, rej, c)(...v) : rej(...v);
 
-        _f(t) && ress.push([res, rej, t]);
-        _f(c) && rejs.push([res, rej, c]);
+        ress.push([res, rej, t]);
+        rejs.push([res, rej, c]);
     });
 
     return {
