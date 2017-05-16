@@ -77,5 +77,35 @@ test('P', t => {
     t.true(zt.called);
     t.true(zt.calledWith('fixed'));
 
+    const at = sinon.spy();
+    const bt = sinon.spy();
+    const cc = sinon.spy();
+    const dc = sinon.spy();
+
+    const a = P((res, rej) => (res(1), res(2)));
+    const b = P((res, rej) => (res(1), rej(2)));
+    const c = P((res, rej) => (rej(1), res(2)));
+    const d = P((res, rej) => (rej(1), rej(2)));
+
+    a.then(at);
+    b.then(bt);
+    c.then(never);
+    d.then(never);
+
+    a.catch(never);
+    b.catch(never);
+    c.catch(cc);
+    d.catch(dc);
+
+    t.true(never.notCalled);
+    t.true(at.called);
+    t.true(at.calledWith(1));
+    t.true(bt.called);
+    t.true(bt.calledWith(1));
+    t.true(cc.called);
+    t.true(cc.calledWith(1));
+    t.true(dc.called);
+    t.true(dc.calledWith(1));
+
     t.end();
 });
