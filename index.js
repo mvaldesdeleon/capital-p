@@ -5,6 +5,7 @@ const P = fn => {
         try { (px => _pf('then', px) ? px.then(res, rej) : res(px))(fn(...args)); }
         catch(err) { rej(err); }
     };
+    const _to = fn => (...args) => process.nextTick(() => fn(...args));
 
     const ress = [], rejs = [];
     let s = 'pen', v;
@@ -22,8 +23,8 @@ const P = fn => {
     });
 
     const then = (t, c) => P((res, rej) => {
-        if (s === 'res') return _f(t) ? _tc(res, rej, t)(...v) : res(...v);
-        else if (s === 'rej') return _f(c) ? _tc(res, rej, c)(...v) : rej(...v);
+        if (s === 'res') return _f(t) ? _to(_tc(res, rej, t))(...v) : res(...v);
+        else if (s === 'rej') return _f(c) ? _to(_tc(res, rej, c))(...v) : rej(...v);
 
         ress.push([res, rej, t]);
         rejs.push([res, rej, c]);
