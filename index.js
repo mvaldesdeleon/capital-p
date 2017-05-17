@@ -36,4 +36,18 @@ const P = fn => {
     };
 };
 
+const all = ([first, ...rest]) => {
+  const wait_next = ([curr, ...rest], values, last_val) => {
+    const latest_values = values.concat(last_val);
+    const next = wait_next.bind(null, rest, latest_values);
+
+    if(curr) return curr.then(next)
+    else return latest_values
+  };
+
+  return first.then(val => wait_next(rest, [], val));
+};
+
+P.all = all;
+
 module.exports = P;
