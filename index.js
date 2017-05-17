@@ -36,16 +36,18 @@ const P = fn => {
     };
 };
 
-const all = ([first, ...rest]) => {
-  const wait_next = ([curr, ...rest], values, last_val) => {
-    const latest_values = values.concat(last_val);
-    const next = wait_next.bind(null, rest, latest_values);
+const all = (promises) => {
+    return P((res, rej) => {
+        const [first, ...rest] = promises.map(p => p.catch(rej));
+        const wait_next = ([curr, ...rest], values, last_val) => {
+            const latest_values = values.concat(last_val);
 
-    if(curr) return curr.then(next)
-    else return latest_values
-  };
+            if(curr) return curr.then(val => wait_next(rest, [], val));
+            else return latest_values;
+        };
 
-  return first.then(val => wait_next(rest, [], val));
+        return first.then(val => wait_next(rest, [], val)).then(res);
+    });
 };
 
 P.all = all;
